@@ -21,3 +21,6 @@ Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+
+docker/*/.vscode-server/*
+!docker/*/.vscode-server/.gitkeep

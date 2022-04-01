@@ -9,8 +9,22 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14.2-bullseye
+        env:
+          POSTGRES_DB: example
+          POSTGRES_INITDB_ARGS: --encoding=UTF-8 --locale=C
+          POSTGRES_PASSWORD: example
+          POSTGRES_USER: example
+          TZ: Asia/Tokyo
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+    - uses: shivammathur/setup-php@v2
       with:
         php-version: '8.1'
     - uses: actions/checkout@v3
@@ -26,8 +40,11 @@ jobs:
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
       working-directory: ./laravel
-    - name: Execute Static Analysis
+    - name: Execute static analysis
       run: vendor/bin/phpstan analyse --level 8 app tests
+      working-directory: ./laravel
+    - name: Execute migrate
+      run: php artisan migrate
       working-directory: ./laravel
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: vendor/bin/phpunit
